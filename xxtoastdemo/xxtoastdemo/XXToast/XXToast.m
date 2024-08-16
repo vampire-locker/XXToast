@@ -35,8 +35,10 @@ static UIWindow *toastWindow = nil;
 + (void)initialize {
     // initialize the toast queue
     toastQueue = [NSMutableArray array];
+    
     // initialize the toast cache
     heightCache = [NSMutableDictionary dictionary];
+    
 }
 
 
@@ -207,7 +209,7 @@ static UIWindow *toastWindow = nil;
         toastView.alpha = 1.0;
         
     } completion:^(BOOL finished) {
-//        // fade out animation
+        // fade out animation
         [UIView animateWithDuration:0.3 delay:duration options:UIViewAnimationOptionAllowUserInteraction animations:^{
             // toastView.alpha = 0.01; using this will disable the gesture
             toastView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0];
