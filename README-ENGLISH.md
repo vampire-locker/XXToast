@@ -9,6 +9,7 @@ Objective-C
 
 ## Supporting Features
 - Automatically displayed in queue order when called;
+- Not occluded by other views;
 - Fade in and out animations;
 - Freely specified display duration;
 - Freely specify the display position, there are three position choices;
