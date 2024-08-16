@@ -17,10 +17,6 @@
 // duration max
 #define XXTOAST_DURATION_MAX 3.0
 
-//@interface XXToast ()<UIGestureRecognizerDelegate>
-//
-//@end
-
 
 @implementation XXToast
 
