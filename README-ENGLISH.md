@@ -2,7 +2,7 @@
 An easy-to-use iOS toast.
 
 ## Documentation
-(Chinese)[https://github.com/vampire-locker/XXToast/blob/main/README.md] | English
+[Chinese](https://github.com/vampire-locker/XXToast/blob/main/README.md) | English
 
 ## Supporting Language
 Objective-C
@@ -34,11 +34,7 @@ Objective-C
 
 ## Display Effect
 - Single line
-![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-single.png)
-![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-single.png)
-![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-single.png)
+![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-single.png) ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-single.png) ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-single.png)
 
 - Multiple line
-![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-multiple.png)
-![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-multiple.png)
-![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-multiple.png)
+![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-multiple.png) ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-multiple.png) ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-multiple.png)

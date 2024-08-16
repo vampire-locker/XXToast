@@ -2,7 +2,8 @@
 一款易用的 iOS 吐司。
 
 ## 参考文档
-中文 | (English)[https://github.com/vampire-locker/XXToast/blob/main/README-ENGLISH.md]
+[]()
+中文 | [English](https://github.com/vampire-locker/XXToast/blob/main/README-ENGLISH.md)
 
 ## 支持语言
 Objective-C
@@ -34,11 +35,7 @@ Objective-C
 
 ## 显示效果
 - 单行
-![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-single.png)
-![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-single.png)
-![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-single.png)
+![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-single.png) ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-single.png) ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-single.png)
 
 - 多行
-![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-multiple.png)
-![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-multiple.png)
-![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-multiple.png)
+![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-multiple.png) ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-multiple.png) ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-multiple.png)
