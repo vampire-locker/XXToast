@@ -1,27 +1,27 @@
 # XXToast
-一款易用的 iOS 吐司。
+An easy-to-use iOS toast.
 
-## 参考文档
-中文 | (English)[https://github.com/vampire-locker/XXToast/blob/main/README-ENGLISH.md]
+## Documentation
+(Chinese)[https://github.com/vampire-locker/XXToast/blob/main/README.md] | English
 
-## 支持语言
+## Supporting Language
 Objective-C
 
-## 支持功能
-- 按队列调用和按队列顺序显示；
-- 淡入淡出动画；
-- 自由的指定显示时长；
-- 自由的指定显示位置，有三种位置选择；
-- 根据内容长度自动调整显示时长（限定最大和最小显示时长）；
-- 点击 toast 关闭。
+## Supporting Features
+- Call by queue and display by queue order;
+- Fade in and out animations;
+- Freely specified display duration;
+- Freely specify the display position, there are three position choices;
+- Automatically adjust display duration based on content length (limit maximum and minimum display duration);
+- Click toast to close.
 
 ## 使用方法
-1、将文件导入工程，导入代码：
+1. Import the file into the project and import the code:
 ```
 #import "XXToast.h"
 ```
 
-2、不同的调用方式：
+2. Different calling methods:
 ```
 [XXToast showWithMessage:@"1111"];
 
@@ -32,13 +32,13 @@ Objective-C
 [XXToast showWithMessage:@"4444" duration:1.0 position:XXToastPositionCenter];
 ```
 
-## 显示效果
-- 单行
+## Display Effect
+- Single line
 ![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-single.png)
 ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-single.png)
 ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-single.png)
 
-- 多行
+- Multiple line
 ![top](https://github.com/vampire-locker/XXToast/blob/main/pic/top-multiple.png)
 ![center](https://github.com/vampire-locker/XXToast/blob/main/pic/center-multiple.png)
 ![bottom](https://github.com/vampire-locker/XXToast/blob/main/pic/bottom-multiple.png)
