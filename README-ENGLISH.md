@@ -15,7 +15,7 @@ Objective-C
 - Automatically adjust display duration based on content length (limit maximum and minimum display duration);
 - Click toast to close.
 
-## 使用方法
+## How to Use
 1. Import the file into the project and import the code:
 ```
 #import "XXToast.h"
