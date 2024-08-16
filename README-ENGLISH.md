@@ -8,7 +8,7 @@ An easy-to-use iOS toast.
 Objective-C
 
 ## Supporting Features
-- Call by queue and display by queue order;
+- Automatically displayed in queue order when called;
 - Fade in and out animations;
 - Freely specified display duration;
 - Freely specify the display position, there are three position choices;
