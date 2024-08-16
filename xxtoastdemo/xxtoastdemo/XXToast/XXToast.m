@@ -26,11 +26,8 @@
 static NSMutableArray *toastQueue;
 // cache
 static NSMutableDictionary *heightCache;
-
-// associate gesture
-static char kTapGestureKey;
-// associated show state
-static char kShowStateKey;
+// alert window
+static UIWindow *toastWindow = nil;
 
 
 #pragma mark - Initialize
@@ -62,7 +59,8 @@ static char kShowStateKey;
 + (void)showWithMessage:(NSString *)message
                duration:(NSTimeInterval)duration
                position:(XXToastPosition)position {
-        
+    
+    // when the parameter duration is 0, the duration is calculated based on the content length
     if (duration == 0.0) {
         NSNumber *cachedHeight = heightCache[message];
         CGFloat textHeight;
@@ -99,6 +97,23 @@ static char kShowStateKey;
 
 
 #pragma mark - Private
+// get the current main (topmost) window.
++ (UIWindow *)getKeyWindow {
+    UIWindow *keyWindow = nil;
+    if (@available(iOS 13.0, *)) {
+        for (UIWindow *window in [UIApplication sharedApplication].windows) {
+            if (window.isKeyWindow) {
+                keyWindow = window;
+                break;
+            }
+        }
+    } else {
+        keyWindow = [UIApplication sharedApplication].keyWindow;
+    }
+    return keyWindow;
+}
+
+
 // next toast show
 + (void)showNextToast {
     
@@ -112,22 +127,32 @@ static char kShowStateKey;
     NSString *message = toastInfo[@"message"];
     NSTimeInterval duration = [toastInfo[@"duration"] doubleValue];
     XXToastPosition position = [toastInfo[@"position"] integerValue];
-
-    UIWindow *window = [self getKeyWindow];
     
+    // Create a new window of type alert, and make sure that toast is displayed at the topmost level
+    if (@available(iOS 13.0, *)) {
+        // get the currently active scene
+        for (UIWindowScene* scene in [UIApplication sharedApplication].connectedScenes) {
+            if (scene.activationState == UISceneActivationStateForegroundActive) {
+                toastWindow = [[UIWindow alloc] initWithWindowScene:scene];
+                break;
+            }
+        }
+    } else {
+        toastWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    }
+    toastWindow.windowLevel = UIWindowLevelAlert + 1;
+    toastWindow.backgroundColor = [UIColor clearColor];
+    toastWindow.hidden = NO;
+    
+    // toast view
     UIView *toastView = [[UIView alloc] init];
     toastView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.7];
     toastView.layer.cornerRadius = 10;
     toastView.clipsToBounds = YES;
     toastView.userInteractionEnabled = YES;
-    
-    
     // add a gesture to toast to trigger the closing of toast
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                                 action:@selector(handleToastTap:)];
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleToastTap:)];
     [toastView addGestureRecognizer:tapGesture];
-    // associate the gesture to toastView
-    [self setTapGesture:tapGesture forToastView:toastView];
     
     // toast content label
     UILabel *messageLabel = [[UILabel alloc] init];
@@ -137,7 +162,7 @@ static char kShowStateKey;
     messageLabel.textAlignment = NSTextAlignmentCenter;
     messageLabel.numberOfLines = 0;
 
-    CGFloat maxWidth = window.bounds.size.width - 40.0;
+    CGFloat maxWidth = toastWindow.bounds.size.width - 40.0;
     CGFloat padding = 10.0;
 
     CGSize maxSize = CGSizeMake(maxWidth - 2 * padding, CGFLOAT_MAX);
@@ -157,117 +182,69 @@ static char kShowStateKey;
             break;
         case XXToastPositionCenter:
             // middle position offset
-            yOffset = (window.bounds.size.height - labelHeight) / 2;
+            yOffset = (toastWindow.bounds.size.height - labelHeight) / 2;
             break;
         case XXToastPositionBottom:
             // bottom position offset
-            yOffset = window.bounds.size.height - 100.0 - labelHeight;
+            yOffset = toastWindow.bounds.size.height - 100.0 - labelHeight;
             break;
     }
 
-    toastView.frame = CGRectMake((window.bounds.size.width - labelWidth) / 2,
+    toastView.frame = CGRectMake((toastWindow.bounds.size.width - labelWidth) / 2,
                                  yOffset,
                                  labelWidth,
                                  labelHeight);
     messageLabel.frame = CGRectMake(padding, padding, labelRect.size.width, labelRect.size.height);
     [toastView addSubview:messageLabel];
-    [window addSubview:toastView];
-    // associate the display status to toastView
-    [self setShowState:YES forToastView:toastView];
+    [toastWindow addSubview:toastView];
+    // make the window visible
+    [toastWindow makeKeyAndVisible];
     
-    __weak typeof(self) weakSelf = self;
-    // toast fade in animation
     // 'UIViewAnimationOptionAllowUserInteraction' gesture behavior during animation is allowed
+    __weak typeof(self) weakSelf = self;
+    // fade in animation
     [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationOptionAllowUserInteraction animations:^{
         toastView.alpha = 1.0;
+        
     } completion:^(BOOL finished) {
-        // toast fade out animation
+//        // fade out animation
         [UIView animateWithDuration:0.3 delay:duration options:UIViewAnimationOptionAllowUserInteraction animations:^{
             // toastView.alpha = 0.01; using this will disable the gesture
             toastView.backgroundColor = [[UIColor blackColor] colorWithAlphaComponent:0.0];
+            
         } completion:^(BOOL finished) {
             // remove the toast view
             [weakSelf removeToastView:toastView];
+            
         }];
+        
     }];
 }
 
-// get the current main (topmost) window.
-+ (UIWindow *)getKeyWindow {
-    UIWindow *keyWindow = nil;
-    if (@available(iOS 13.0, *)) {
-        for (UIWindow *window in [UIApplication sharedApplication].windows) {
-            if (window.isKeyWindow) {
-                keyWindow = window;
-                break;
-            }
-        }
-    } else {
-        keyWindow = [UIApplication sharedApplication].keyWindow;
-    }
-    return keyWindow;
-}
 
 // handling click events
 + (void)handleToastTap:(UITapGestureRecognizer *)recognizer {
-    
-    UIWindow *window = [self getKeyWindow];
-    UIView *toastView = [window.subviews lastObject];
-    
-    if ([self getTapGestureForToastView:toastView]) {
-        [self setTapGesture:nil forToastView:toastView];
-    }
-    
-    if ([self getShowStateForToastView:toastView]) {
-        // no animation is needed here because the second animateWithDuration of the toastView in the showNextToast method is executed when the toastView is removed
-        [toastView removeFromSuperview];
-        [self setShowState:NO forToastView:toastView];
-    }
-    
+    UIView *toastView = [toastWindow.subviews lastObject];
+    // removeFromSuperview will trigger the completion callback for an unfinished fade-out animation from toastView
+    [toastView removeFromSuperview];
 }
+
 
 // remove the toast view
 + (void)removeToastView:(UIView *)toastView {
-    
-    UITapGestureRecognizer *tapGesture = [self getTapGestureForToastView:toastView];
-    if (tapGesture) {
-        [toastView removeGestureRecognizer:tapGesture];
-        [self setTapGesture:nil forToastView:toastView];
-    }
-    
-    if ([self getShowStateForToastView:toastView]) {
+    if (toastView) {
         [toastView removeFromSuperview];
-        [self setShowState:NO forToastView:toastView];
     }
     
     if (toastQueue.count > 0) {
         [toastQueue removeObjectAtIndex:0];
     }
     
+    toastWindow.hidden = YES;
+    toastWindow = nil;
+    
     [self showNextToast];
     
-}
-
-
-#pragma mark - Property binding
-// associate gesture
-+ (void)setTapGesture:(UITapGestureRecognizer *)tapGesture forToastView:(UIView *)toastView {
-    objc_setAssociatedObject(toastView, &kTapGestureKey, tapGesture, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-+ (UITapGestureRecognizer *)getTapGestureForToastView:(UIView *)toastView {
-    return objc_getAssociatedObject(toastView, &kTapGestureKey);
-}
-
-// associated show state
-+ (void)setShowState:(BOOL)exit forToastView:(UIView *)toastView {
-    NSNumber *value = [NSNumber numberWithBool:exit];
-    objc_setAssociatedObject(toastView, &kShowStateKey, value, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-}
-
-+ (BOOL)getShowStateForToastView:(UIView *)toastView {
-    NSNumber *value = objc_getAssociatedObject(toastView, &kShowStateKey);
-    return [value boolValue];
 }
 
 
