@@ -25,7 +25,7 @@
 // queue(array is ordered)
 static NSMutableArray *toastQueue;
 // cache
-static NSMutableDictionary *heightCache;
+static NSCache *heightCache;
 // alert window
 static UIWindow *toastWindow = nil;
 
@@ -37,7 +37,9 @@ static UIWindow *toastWindow = nil;
     toastQueue = [NSMutableArray array];
     
     // initialize the toast cache
-    heightCache = [NSMutableDictionary dictionary];
+    heightCache = [[NSCache alloc] init];
+    // cache count limit
+    heightCache.countLimit = 100;
     
 }
 
@@ -72,20 +74,7 @@ static UIWindow *toastWindow = nil;
     
     // when the parameter duration is 0, the duration is calculated based on the content length
     if (duration == 0.0) {
-        NSNumber *cachedHeight = heightCache[message];
-        CGFloat textHeight;
-        if (cachedHeight) {
-            textHeight = [cachedHeight floatValue];
-        } else {
-            CGSize maxSize = CGSizeMake([self getKeyWindow].bounds.size.width - 40.0 - 20.0, CGFLOAT_MAX);
-            CGRect labelRect = [message boundingRectWithSize:maxSize
-                                                     options:NSStringDrawingUsesLineFragmentOrigin
-                                                  attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:XXTOAST_FONT_SIZE]}
-                                                     context:nil];
-            textHeight = ceil(labelRect.size.height) + 20.0;
-            // add caching to reduce double counting
-            heightCache[message] = @(textHeight);
-        }
+        CGFloat textHeight = [self calculateTextHeightForMessage:message];
         duration = MAX(XXTOAST_DURATION_MIN, MIN(XXTOAST_DURATION_MAX, textHeight / 20.0));
     }
     
@@ -107,6 +96,28 @@ static UIWindow *toastWindow = nil;
 
 
 #pragma mark - Private
+// calculate the height based on the content
++ (CGFloat)calculateTextHeightForMessage:(NSString*)message {
+    CGFloat screenWidth = UIScreen.mainScreen.bounds.size.width;
+    NSString *cacheKey = [NSString stringWithFormat:@"%@-%.0f", message, screenWidth];
+    NSNumber *cachedHeight = [heightCache objectForKey:cacheKey];
+    CGFloat textHeight;
+    if (cachedHeight) {
+        textHeight = [cachedHeight floatValue];
+    } else {
+        CGSize maxSize = CGSizeMake(screenWidth - 40.0 - 20.0, CGFLOAT_MAX);
+        CGRect labelRect = [message boundingRectWithSize:maxSize
+                                                 options:NSStringDrawingUsesLineFragmentOrigin
+                                              attributes:@{NSFontAttributeName: [UIFont systemFontOfSize:XXTOAST_FONT_SIZE]}
+                                                 context:nil];
+        textHeight = ceil(labelRect.size.height) + 20.0;
+        // add caching to reduce double counting
+        [heightCache setObject:@(textHeight) forKey:cacheKey];
+    }
+    return textHeight;
+}
+
+
 // get the current main (topmost) window.
 + (UIWindow *)getKeyWindow {
     UIWindow *keyWindow = nil;
