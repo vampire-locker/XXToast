@@ -62,6 +62,14 @@ static UIWindow *toastWindow = nil;
                duration:(NSTimeInterval)duration
                position:(XXToastPosition)position {
     
+    if (message == nil || message.length == 0) {
+        return;
+    }
+    if (message.length > 1000) {
+        NSLog(@"Toast message is too long, consider truncating it.");
+        message = [message substringToIndex:1000];
+    }
+    
     // when the parameter duration is 0, the duration is calculated based on the content length
     if (duration == 0.0) {
         NSNumber *cachedHeight = heightCache[message];
