@@ -139,7 +139,9 @@ static UIWindow *toastWindow = nil;
                 break;
             }
         }
-    } else {
+    }
+    // UIWindowScene is not necessarily used on iOS 13
+    if (!toastWindow) {
         toastWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
     }
     toastWindow.windowLevel = UIWindowLevelAlert + 1;
